@@ -1,20 +1,26 @@
-from pyspark.sql import SparkSession
+--------EJECUTAR BASH INTERACTIVO-----
+
+docker compose run --rm spark bash
+
+
+
+------LUEGO DENTRO----
+
+pyspark
+
+
+------------------LIMPIEZA, COLUMNAS Y DATOS IMPORTANTES------------------
+
 from pyspark.sql.functions import col
 
-# Crear la sesión de Spark
-spark = SparkSession.builder.appName("ETL Limpieza Dataset").getOrCreate()
-
-# Leer el CSV original
-df = spark.read.csv("/opt/spark-data/dataset.csv", header=True, inferSchema=True)
-
-# Columnas que queremos mantener
+# Columnas originales que queremos mantener
 columnas_mantener = [
     "ANIO", "MES", "CONGLOMERADO", "MUESTRA", "SELVIV", "HOGAR", "REGION", 
     "LLAVE_PANEL", "ESTRATO", "OCUP300", "INGTOT", 
     "C207", "C208", "C366", "C366_1", "C331", "C308_COD", "C309_COD"
 ]
 
-# Filtrar las columnas
+# Seleccionar solo esas columnas
 df = df.select(*columnas_mantener)
 
 # Renombrar las columnas
@@ -39,14 +45,6 @@ df = (df
     .withColumnRenamed("C309_COD", "sector")
 )
 
-# Mostrar esquema y ejemplo
+# Mostrar el resultado
 df.printSchema()
 df.show(5)
-
-# Guardar el nuevo CSV (en la carpeta de salida)
-df.coalesce(1).write.csv("/opt/spark-data/dataset_filtrado", header=True, mode="overwrite")
-
-print("✅ Limpieza completada. Archivo guardado en /opt/spark-data/dataset_filtrado")
-
-# Detener sesión
-spark.stop()

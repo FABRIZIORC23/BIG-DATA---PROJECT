@@ -11,3 +11,6 @@ services:
         - action: sync
           path: ./app
           target: /app
+
+    volumes:
+      - ./data:/opt/spark-data
